@@ -19,6 +19,15 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Read version from package.json
+        id: vars
+        run: echo "VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_OUTPUT
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
@@ -26,4 +35,5 @@ jobs:
           push: true
           tags: |
             alchikinov/k8s-web-hello:latest
-            alchikinov/k8s-web-hello:1.0.0
+            alchikinov/k8s-web-hello:${{ steps.vars.outputs.VERSION }}
+
